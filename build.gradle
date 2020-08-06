@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.15'
+}
+
+group 'com.dynatrace'
+version '1.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://m2proxy.atlassian.com/repository/public"
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-app', version: '5.2.0'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2020.2'
+    plugins 'git4idea'
+}
+
+patchPluginXml {
+    //sinceBuild '19.0'
+    //untilBuild '201'
+    changeNotes """
+      1.1 Customizable JQL filter, update for 2020.2\n\n
+      
+      1.0 Added Jira integration in status bar\n\n
+
+      0.3 Ask user before commiting without a ticket, various quality of life improvements\n
+      
+      0.2 Update for 2020.1\n
+      
+      0.1 Initial release.
+      """
+}
