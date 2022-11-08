@@ -6,7 +6,6 @@ import git4idea.GitLocalBranch;
 import git4idea.branch.GitBranchUiHandlerImpl;
 import git4idea.branch.GitBranchUtil;
 import git4idea.branch.GitBranchWorker;
-import git4idea.branch.GitCreateBranchOperation;
 import git4idea.commands.Git;
 import git4idea.i18n.GitBundle;
 import git4idea.repo.GitRepository;
@@ -18,22 +17,21 @@ import java.util.Map;
 
 public class GitUtil {
 
-    private GitUtil() {}
+    private GitUtil() {
+    }
 
     public static String getCurrentBranchName(@NotNull final Project project) {
-        GitRepository repository;
-        GitLocalBranch localBranch;
         String branchName = "";
-        try {
-            repository = GitBranchUtil.getCurrentRepository(project);
-            localBranch = repository.getCurrentBranch();
+
+        GitRepository repository = GitBranchUtil.getCurrentRepository(project);
+        if (repository == null) {
+            return branchName;
+        }
+        GitLocalBranch localBranch = repository.getCurrentBranch();
+        if (localBranch != null) {
             branchName = localBranch.getName();
-        } catch (Exception e) {
-            e.getMessage();
         }
-        if (branchName == null) {
-            branchName = "";
-        }
+
         return branchName;
     }
 
@@ -68,7 +66,6 @@ public class GitUtil {
     private static GitBranchWorker newWorker(@NotNull Project project, @NotNull ProgressIndicator indicator) {
         return new GitBranchWorker(project, Git.getInstance(), new GitBranchUiHandlerImpl(project, Git.getInstance(), indicator));
     }
-
 
 
 }

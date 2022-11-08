@@ -24,27 +24,23 @@ public class JiraTicketClient {
     JiraRestClient client;
 
     public JiraTicketClient(String baseUrl, String user, String password) {
-
         JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
         URI jiraServerUri;
-        try
-        {
+        try {
             jiraServerUri = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Could not parse the JIRA Base URL: " + e.getMessage(), e);
         }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException("Could not understand the JIRA Base URL: " + e.getMessage(), e);
-        }
-
 
         client = factory.createWithBasicHttpAuthentication(jiraServerUri, user, password);
-
     }
 
     public void startProgress(Issue ticket) {
         final Iterable<Transition> transitions = client.getIssueClient().getTransitions(ticket).claim();
         final Transition startProgressTransition = JiraTicketUtil.getTransitionByName(transitions, "Start Progress");
-        client.getIssueClient().transition(ticket, new TransitionInput(startProgressTransition.getId()));
+        if (startProgressTransition != null) {
+            client.getIssueClient().transition(ticket, new TransitionInput(startProgressTransition.getId()));
+        }
     }
 
     public Collection<Issue> getIssuesForQuery(String jqlQuery) {
@@ -64,7 +60,7 @@ public class JiraTicketClient {
             results.getIssues().forEach(issues::add);
         } catch (RestClientException e) {
             String errorMessage = e.getStatusCode().isPresent() ?
-                    "Status code " + e.getStatusCode().get() + " with message " + e.getMessage() :
+                    String.format("Status code %d with message %s", e.getStatusCode().get(), e.getMessage()) :
                     e.getMessage();
 
             Notification.notifyError("Could not connect to the Jira server", errorMessage);

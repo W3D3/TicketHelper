@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.dynatrace.TicketHelper</id>
     <name>TicketHelper</name>
-    <vendor email="christoph.wedenig@dynatrace.com" url="http://www.dynatrace.com">Dynatrace</vendor>
+    <vendor email="christoph.wedenig@dynatrace.com" url="https://www.dynatrace.com">Dynatrace</vendor>
 
     <description><![CDATA[
     Helps with keeping the ticket in the commit message.
@@ -15,9 +15,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <checkinHandlerFactory implementation="precommit.PreCommitCheckinHandlerFactory"  />
-        <!--        <projectConfigurable groupId="tools"-->
-        <!--                             displayName="Pre Commit Hook"-->
-        <!--                             instance="HookConfigurable" />-->
         <statusBarWidgetFactory id="startTicketBar"
                                 implementation="jira.ui.JiraTicketsPanelWidgetFactory"
                                 order="after codeStyleWidget,before readOnlyWidget"/>
@@ -25,8 +22,7 @@
         <!-- settings -->
         <projectConfigurable groupId="tools" displayName="Ticket Helper Plugin"
                              instance="settings.TicketHelperConfigurable"/>
-        <projectService serviceInterface="settings.TicketHelperConfig"
-                        serviceImplementation="settings.TicketHelperConfig"/>
+        <projectService serviceImplementation="settings.TicketHelperConfig"/>
     </extensions>
 
     <actions>

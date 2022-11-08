@@ -1,7 +1,11 @@
 package jira;
 
 import com.intellij.ide.lightEdit.LightEditCompatible;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -34,8 +38,11 @@ public class ChangeJiraTicketsAction extends AnAction implements DumbAware, Ligh
     @Override
     public final void actionPerformed(@NotNull final AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
-
-        ListPopup popup = createPopup(e.getProject(), dataContext);
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        ListPopup popup = createPopup(project, dataContext);
         if (popup != null) {
             popup.showInBestPositionFor(dataContext);
         }

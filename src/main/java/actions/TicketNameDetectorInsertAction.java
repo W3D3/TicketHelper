@@ -7,34 +7,14 @@ import com.intellij.openapi.vcs.CheckinProjectPanel;
 import com.intellij.openapi.vcs.CommitMessageI;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.ui.Refreshable;
+import logic.TicketExtractor;
 import logic.TicketPrepender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import util.GitUtil;
 import util.Notification;
-import logic.TicketExtractor;
 
 public class TicketNameDetectorInsertAction extends AnAction {
-
-    private Project project;
-    private CheckinProjectPanel checkinPanel;
-
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
-        project = actionEvent.getProject();
-        checkinPanel = (CheckinProjectPanel) getCheckinPanel(actionEvent);
-        if (checkinPanel == null)
-            return;
-
-        String currentBranchName = GitUtil.getCurrentBranchName(project);
-        String ticketName = TicketExtractor.extractFromString(currentBranchName);
-
-        if(!ticketName.isEmpty()) {
-            TicketPrepender.prependTicket(checkinPanel, ticketName, true);
-        } else {
-            Notification.notifyWarning("Not a valid ticket branch", "Nothing was prepended to your commit message.");
-        }
-    }
 
     @Nullable
     private static CommitMessageI getCheckinPanel(@Nullable AnActionEvent e) {
@@ -45,11 +25,24 @@ public class TicketNameDetectorInsertAction extends AnAction {
         if (data instanceof CommitMessageI) {
             return (CommitMessageI) data;
         }
-        CommitMessageI commitMessageI = VcsDataKeys.COMMIT_MESSAGE_CONTROL.getData(e.getDataContext());
-        if (commitMessageI != null) {
-            return commitMessageI;
+        return VcsDataKeys.COMMIT_MESSAGE_CONTROL.getData(e.getDataContext());
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+        Project project = actionEvent.getProject();
+        CheckinProjectPanel checkinPanel = (CheckinProjectPanel) getCheckinPanel(actionEvent);
+        if (project == null || checkinPanel == null)
+            return;
+
+        String currentBranchName = GitUtil.getCurrentBranchName(project);
+        String ticketName = TicketExtractor.extractFromString(currentBranchName);
+
+        if (!ticketName.isEmpty()) {
+            TicketPrepender.prependTicket(checkinPanel, ticketName, true);
+        } else {
+            Notification.notifyWarning("Not a valid ticket branch", "Nothing was prepended to your commit message.");
         }
-        return null;
     }
 
     @Override
